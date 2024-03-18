@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:socialme/Screens/ProfileScreen.dart';
+import 'package:socialme/Screens/AddFeelScreen.dart';
 
 
 class FeedScreen extends StatelessWidget {
@@ -6,13 +8,37 @@ class FeedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Feed Activity'),
+        title: Text('ANA SAYFA'),
       ),
-      body: Center(
-        child: Text(
-          'Hoş Geldiniz!',
-          style: TextStyle(fontSize: 24.0),
-        ),
+      body: Container(
+        color: Colors.greenAccent,
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddFeelScreen()),
+              );
+            },
+            child: Icon(Icons.add),
+          ),
+          SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: () {
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
+            },
+            child: Icon(Icons.person),
+          ),
+        ],
       ),
     );
   }
