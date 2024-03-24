@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddFeelScreen extends StatelessWidget {
+  final TextEditingController _feelController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +27,7 @@ class AddFeelScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             TextFormField(
+              controller: _feelController,
               maxLines: 5, // Çok satırlı metin girişi için
               decoration: InputDecoration(
                 border: OutlineInputBorder(), // Kenarlık eklemek için
@@ -32,7 +37,7 @@ class AddFeelScreen extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // His paylaşma işlemi burada yapılacak
+                _shareFeel(context);
               },
               child: Text('Paylaş'),
             ),
@@ -40,5 +45,40 @@ class AddFeelScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _shareFeel(BuildContext context) {
+    String feel = _feelController.text.trim();
+    String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    if (feel.isNotEmpty && userId.isNotEmpty) {
+      // Firestore veritabanına hissi eklemek için referans alınır
+      CollectionReference feelsRef = FirebaseFirestore.instance.collection('feels');
+
+      // Hissi Firestore'a eklemek için bir döküman oluşturulur
+      feelsRef.add({
+        'userId': userId,
+        'feel': feel,
+        'timestamp': FieldValue.serverTimestamp(),
+      }).then((_) {
+        // His paylaşma başarılıysa
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Hissiniz başarıyla paylaşıldı.'),
+          backgroundColor: Colors.green,
+        ));
+      }).catchError((error) {
+        // Hata durumunda
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Hissinizi paylaşırken bir hata oluştu: $error'),
+          backgroundColor: Colors.red,
+        ));
+      });
+    } else {
+      // His veya kullanıcı kimliği boşsa hata mesajı gösterilir
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Lütfen bir his yazın.'),
+        backgroundColor: Colors.red,
+      ));
+    }
   }
 }
